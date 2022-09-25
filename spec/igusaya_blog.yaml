@@ -1,0 +1,35 @@
+openapi: 3.0.0
+
+info:
+  title: "igusaya_blog"
+  description: "個人用内製Blog"
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:18080
+    description: Local server
+
+tags:
+  - name: health
+
+paths:
+  /health:
+    get:
+      description: 疎通確認用
+      tags:
+        - health
+      responses:
+        200:
+          description: successful test response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+
+components:
+  schemas:
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
