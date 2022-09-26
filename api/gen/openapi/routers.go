@@ -42,8 +42,9 @@ type Router interface {
 const errMsgRequiredMissing = "required parameter is missing"
 
 // NewRouter creates a new router for any number of api routers
-func NewRouter(routers ...Router) chi.Router {
-	router := chi.NewRouter()
+// 引数に「router chi.Router」を追加し、router.goでミドルウェアを追加できるように修正
+func NewRouter(router chi.Router, routers ...Router) chi.Router {
+	// router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	for _, api := range routers {
 		for _, route := range api.Routes() {
