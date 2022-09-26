@@ -29,4 +29,4 @@ README.md
 /api/*
 /.openapi-generator/*
 /openapi/*_service.go
-#/openapi/routers.go
+/openapi/routers.go
