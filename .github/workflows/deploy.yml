@@ -6,7 +6,6 @@ on:
     paths:
       - "api/*"
       - ".github/workflows/deploy.yml"
-      - "Dockerfile"
 env:
   SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -28,7 +27,7 @@ jobs:
         run: gcloud auth configure-docker --quiet
 
       - name: Build a docker image
-        run: docker build -t ${{ env.IMAGE }} .
+        run: docker build -t ${{ env.IMAGE }} api/
         # DockerFileを求められる
 
       - name: Push the docker image

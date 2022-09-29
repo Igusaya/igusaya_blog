@@ -3,10 +3,10 @@ FROM golang:1.19.1-alpine3.16 as deploy-builder
 
 WORKDIR /app
 
-COPY api/go.mod api/go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
 
-COPY ./api .
+COPY . .
 RUN go build -o main
 
 # -------------------------------------------
