@@ -21,3 +21,12 @@ EXPOSE 8080
 CMD ["/app/main"]
 
 # -------------------------------------------
+
+# ローカル開発環境で利用するホットリロード環境
+FROM golang:1.19 as dev
+
+WORKDIR /app
+
+RUN go install github.com/cosmtrek/air@latest
+
+CMD ["air"]
