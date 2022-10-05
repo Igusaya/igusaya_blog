@@ -11,6 +11,7 @@ servers:
 
 tags:
   - name: health
+  - name: article
 
 paths:
   /health:
@@ -25,6 +26,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Health'
+
+  /article:
+    $ref: './paths/article.yml'
 
 components:
   schemas:

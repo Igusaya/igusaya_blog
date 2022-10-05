@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := help
 
 openapi: ## generates codes by openapi-generator
-	docker run --rm -v ${PWD}:/root -v ${PWD}/spec:/spec  openapitools/openapi-generator-cli:v6.0.0 generate -g go-server -i /spec/igusaya_blog.yaml -o /root/api/gen --additional-properties=packageName=openapi,router=chi,sourceFolder=openapi
+	docker run --rm -v ${PWD}:/root -v ${PWD}/spec:/spec  openapitools/openapi-generator-cli:v6.0.0 generate -g go-server -i /spec/igusaya_blog.yml -o /root/api/gen --additional-properties=packageName=openapi,router=chi,sourceFolder=openapi
 	goimports -w api/gen/openapi/*
 
 api-up: ## Do docker compose up with hot reload

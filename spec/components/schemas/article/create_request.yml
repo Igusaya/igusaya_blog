@@ -1,0 +1,13 @@
+type: object
+properties:
+  subject:
+    description: '表題'
+    type: string
+    example: 'Goについて'
+  body:
+    description: '記事'
+    type: string
+    example: 'Goってば機能を追加するでなく、シンプルにすることで開発体験を向上させるってコンセプトでスゲーくせになる書き心地。'
+required:
+  - subject
+  - body

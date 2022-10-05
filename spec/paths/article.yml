@@ -1,0 +1,15 @@
+post:
+  summary: 記事投稿 
+  description: 記事投稿
+  tags:
+    - article
+  operationId: create_article
+# security: TODO
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../components/schemas/article/create_request.yml'
+  responses:
+    200:
+      description: successful post article response
