@@ -12,4 +12,30 @@
 ## 要install
 ```shell
 $ go install golang.org/x/tools/cmd/goimports@latest  
+$ go install github.com/k0kubun/sqldef/cmd/mysqldef@latest  
 ```
+
+## TODO
+- DB設計
+  - articles
+  - tags
+  - articles_tags
+  - comments
+  - articles-comments
+  - admin
+- DB接続
+- テスト自動化
+- 機能
+  - 記事投稿
+  - 記事一覧
+  - 記事詳細
+  - 記事更新
+  - 記事削除
+  - ログイン
+
+今後の予定
+1. 記事投稿spec作成
+1. 記事投稿実装
+1. front作成
+1. 結合
+1. Google認証実装(spec front api)

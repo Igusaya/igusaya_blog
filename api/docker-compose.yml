@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  app:
+    image: igusaya-blog-api
+    build:
+      args:
+        - target=dev
+    environment:
+      BLOG_ENV: dev
+      PORT: 8080
+      BLOG_DB_HOST: blog-db
+      BLOG_DB_PORT: 3306
+      BLOG_DB_USER: user
+      BLOG_DB_PASSWORD: pass
+      BLOG_DB_DATABASE: blog
+    volumes:
+      - .:/app
+    ports:
+      - "18000:8080"
+  blog-db:
+    image: mysql:8.0.29
+    platform: linux/amd64
+    container_name: blog-db
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_DATABASE: blog
+    volumes:
+      - blog-db-data:/var/lib/mysql
+      - $PWD/_tools/mysql/conf.d:/etc/mysql/conf.d:cached
+    ports:
+      - "33306:3306"
+volumes:
+  blog-db-data:
