@@ -27,7 +27,7 @@ jobs:
         run: gcloud auth configure-docker --quiet
 
       - name: Build a docker image
-        run: docker build -t ${{ env.IMAGE }} api/
+        run: docker build -t ${{ env.IMAGE }} --target=deploy api/
         # DockerFileを求められる
 
       - name: Push the docker image
