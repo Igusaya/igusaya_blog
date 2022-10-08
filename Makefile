@@ -1,4 +1,4 @@
-.PHONY: help openapi api-up api-down api-logs ps 
+.PHONY: help openapi api-up api-down api-logs ps test-api
 .DEFAULT_GOAL := help
 
 openapi: ## generates codes by openapi-generator
@@ -26,6 +26,11 @@ migrate:  ## Execute migration
 
 mysql: ## run mysql
 	mysql -h 127.0.0.1 -P 33306 -u user -p blog
+
+test: test.api ## Execute tests
+
+test.api: ## Execute api tests
+	go test -race -shuffle=on ./api/...
 
 help: ## Show options
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
