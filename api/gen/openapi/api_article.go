@@ -49,16 +49,16 @@ func NewArticleApiController(s ArticleApiServicer, opts ...ArticleApiOption) Rou
 func (c *ArticleApiController) Routes() Routes {
 	return Routes{
 		{
-			"CreateArticle",
+			"PostArticle",
 			strings.ToUpper("Post"),
 			"/article",
-			c.CreateArticle,
+			c.PostArticle,
 		},
 	}
 }
 
-// CreateArticle - 記事投稿
-func (c *ArticleApiController) CreateArticle(w http.ResponseWriter, r *http.Request) {
+// PostArticle - 記事投稿
+func (c *ArticleApiController) PostArticle(w http.ResponseWriter, r *http.Request) {
 	createRequestParam := CreateRequest{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -70,7 +70,7 @@ func (c *ArticleApiController) CreateArticle(w http.ResponseWriter, r *http.Requ
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.CreateArticle(r.Context(), createRequestParam)
+	result, err := c.service.PostArticle(r.Context(), createRequestParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

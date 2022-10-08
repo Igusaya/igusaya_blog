@@ -34,8 +34,15 @@ $ go install github.com/k0kubun/sqldef/cmd/mysqldef@latest
   - ログイン
 
 今後の予定
-1. 記事投稿spec作成
-1. 記事投稿実装
+1. 記事投稿spec作成 
+   - ok
+1. 記事投稿実装  
+   - 疎通確認 ok
+   - 残：テストコード
+1. develop環境整備
+   - DB用意
+   - DB結合確認
 1. front作成
 1. 結合
+1. develop環境での結合
 1. Google認証実装(spec front api)

@@ -18,7 +18,7 @@ import (
 // The ArticleApiRouter implementation should parse necessary information from the http request,
 // pass the data to a ArticleApiServicer to perform the required actions, then write the service results to the http response.
 type ArticleApiRouter interface {
-	CreateArticle(http.ResponseWriter, *http.Request)
+	PostArticle(http.ResponseWriter, *http.Request)
 }
 
 // HealthApiRouter defines the required methods for binding the api requests to a responses for the HealthApi
@@ -33,7 +33,7 @@ type HealthApiRouter interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type ArticleApiServicer interface {
-	CreateArticle(context.Context, CreateRequest) (ImplResponse, error)
+	PostArticle(context.Context, CreateRequest) (ImplResponse, error)
 }
 
 // HealthApiServicer defines the api actions for the HealthApi service

@@ -3,7 +3,7 @@ post:
   description: 記事投稿
   tags:
     - article
-  operationId: create_article
+  operationId: post_article
 # security: TODO
   requestBody:
     content:
