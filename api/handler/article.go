@@ -24,7 +24,6 @@ func NewArticleHandler(
 func (h *ArticleHandler) PostArticle(
 	ctx context.Context, req openapi.CreateRequest,
 ) (openapi.ImplResponse, error) {
-	fmt.Printf("req: %#v\n", req)
 	a := &domain.Article{
 		Subject: req.Subject,
 		Body:    req.Body,

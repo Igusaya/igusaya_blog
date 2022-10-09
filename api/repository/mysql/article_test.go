@@ -3,7 +3,6 @@ package mysql
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 	"testing"
 
@@ -59,9 +58,6 @@ func TestArticle_InsertArticle(t *testing.T) {
 			gotErr := r.InsertArticle(tt.args.ctx, tt.args.db, tt.args.a)
 			if tt.wantErr == nil && gotErr != nil {
 				t.Fatalf("unexpected err: %+v", gotErr)
-			}
-			if gotErr != nil && tt.wantErr != nil {
-				fmt.Printf("got: %s\nwant: %s\n", gotErr.Error(), tt.wantErr.Error())
 			}
 			if (tt.wantErr != nil && gotErr != nil) &&
 				!strings.Contains(gotErr.Error(), tt.wantErr.Error()) {

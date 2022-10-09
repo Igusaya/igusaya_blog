@@ -52,9 +52,9 @@ func TestAdmin_SubmitArticle(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			admin := mocks.NewMockArticleRepository(ctrl)
-			admin.EXPECT().InsertArticle(gomock.Any(), gomock.Any(), tt.mWant).Return(tt.mResult)
-			u := NewAdminUsecase(testutil.OpenDBForTest(t), admin)
+			articleRepo := mocks.NewMockArticleRepository(ctrl)
+			articleRepo.EXPECT().InsertArticle(gomock.Any(), gomock.Any(), tt.mWant).Return(tt.mResult)
+			u := NewAdminUsecase(testutil.OpenDBForTest(t), articleRepo)
 			gotErr := u.SubmitArticle(tt.args.ctx, tt.args.a)
 			if tt.wantErr == nil && gotErr != nil {
 				t.Fatalf("unexpected err: %+v", gotErr)
