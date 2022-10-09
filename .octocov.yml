@@ -1,6 +1,6 @@
 coverage:
   paths:
-    - coverage.out
+    - api/coverage.out
 codeToTestRatio:
   code:
     - '**/*.go'
@@ -18,3 +18,5 @@ report:
   if: is_default_branch
   datastores:
     - artifact://${GITHUB_REPOSITORY}
+repository:
+  Igusaya/igusaya_blog/api
