@@ -14,5 +14,6 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
-gen/.openapi-generator/
-gen/api/
+gen/.openapi-generator
+gen/api
+tmp

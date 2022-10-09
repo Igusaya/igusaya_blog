@@ -6,11 +6,12 @@ info:
   version: "1.0.0"
 
 servers:
-  - url: http://localhost:18080
+  - url: http://localhost:18000
     description: Local server
 
 tags:
   - name: health
+  - name: article
 
 paths:
   /health:
@@ -25,6 +26,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Health'
+
+  /article:
+    $ref: './paths/article.yml'
 
 components:
   schemas:

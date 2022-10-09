@@ -1,8 +1,9 @@
-.PHONY: help openapi api-up api-down api-logs ps 
+.PHONY: help openapi api-up api-down api-logs ps test-api
 .DEFAULT_GOAL := help
 
 openapi: ## generates codes by openapi-generator
-	docker run --rm -v ${PWD}:/root -v ${PWD}/spec:/spec  openapitools/openapi-generator-cli:v6.0.0 generate -g go-server -i /spec/igusaya_blog.yaml -o /root/api/gen --additional-properties=packageName=openapi,router=chi,sourceFolder=openapi
+	find ./api/gen/openapi/ -type f | grep -v -E 'routers.go' | xargs rm -rf
+	docker run --rm -v ${PWD}:/root -v ${PWD}/spec:/spec  openapitools/openapi-generator-cli:v6.0.0 generate -g go-server -i /spec/igusaya_blog.yml -o /root/api/gen --additional-properties=packageName=openapi,router=chi,sourceFolder=openapi
 	goimports -w api/gen/openapi/*
 
 api-up: ## Do docker compose up with hot reload
@@ -24,7 +25,15 @@ migrate:  ## Execute migration
 	mysqldef -u user -p pass -h 127.0.0.1 -P 33306 blog < ./api/_tools/mysql/schema.sql
 
 mysql: ## run mysql
-	mysql -h 127.0.0.1 -P 33306 -u todo -ptodo
+	mysql -h 127.0.0.1 -P 33306 -u user -p blog
+
+test: test.api ## Execute tests
+
+test.api: ## Execute api tests
+	go test -race -shuffle=on ./api/...
+
+generate-mocks: ## generate mocks for api
+	go generate ./api/...
 
 help: ## Show options
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
