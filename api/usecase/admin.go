@@ -25,7 +25,7 @@ func NewAdminUsecase(
 
 func (u *AdminUsecase) SubmitArticle(ctx context.Context, a *domain.Article) error {
 	if err := u.ArticleRepo.InsertArticle(ctx, u.DB, a); err != nil {
-		return fmt.Errorf("AdminUsecase.CreateArticle to CreateArticle: %w", err)
+		return fmt.Errorf("AdminUsecase.CreateArticle to ArticleRepo.InsertArticle: %w", err)
 	}
 	return nil
 }
