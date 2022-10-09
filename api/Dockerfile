@@ -17,7 +17,6 @@ FROM alpine:3.15 as deploy
 WORKDIR /app
 COPY --from=deploy-builder /app/main .
 
-EXPOSE 8080
 CMD ["/app/main"]
 
 # -------------------------------------------
