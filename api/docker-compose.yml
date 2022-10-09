@@ -6,7 +6,7 @@ services:
       args:
         - target=dev
     environment:
-      BLOG_ENV: dev
+      BLOG_ENV: local
       PORT: 8080
       BLOG_DB_HOST: blog-db
       BLOG_DB_PORT: 3306

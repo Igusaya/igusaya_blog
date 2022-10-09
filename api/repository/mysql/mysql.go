@@ -5,10 +5,15 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
+	"net"
+	"os"
 	"time"
 
+	"cloud.google.com/go/cloudsqlconn"
 	"github.com/Igusaya/igusaya_blog/api/clock"
 	"github.com/Igusaya/igusaya_blog/api/config"
+	"github.com/go-sql-driver/mysql"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
@@ -25,6 +30,16 @@ var (
 )
 
 func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
+	if cfg.Env == "local" {
+		return localConnect(ctx, cfg)
+	} else if cfg.Env == "develop" {
+		return gcpSqlConnect(ctx, cfg)
+	} else {
+		return nil, nil, fmt.Errorf("Warning: %s environment variable not set.", cfg.Env)
+	}
+}
+
+func localConnect(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
 	// sqlx.Connectを使うと内部でpingする。
 	db, err := sql.Open("mysql",
 		fmt.Sprintf(
@@ -34,12 +49,6 @@ func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
 			cfg.DBName,
 		),
 	)
-	fmt.Printf(
-		"%s:%s@tcp(%s:%d)/%s?parseTime=true\n",
-		cfg.DBUser, cfg.DBPassword,
-		cfg.DBHost, cfg.DBPort,
-		cfg.DBName,
-	)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -47,8 +56,46 @@ func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
 	if err := db.PingContext(ctx); err != nil {
-		fmt.Printf("err!!!!: %#v\n", err)
 		return nil, func() { _ = db.Close() }, err
+	}
+	xdb := sqlx.NewDb(db, "mysql")
+	return xdb, func() { _ = db.Close() }, nil
+}
+
+func gcpSqlConnect(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
+	mustGetenv := func(k string) string {
+		v := os.Getenv(k)
+		if v == "" {
+			log.Fatalf("Warning: %s environment variable not set.", k)
+		}
+		return v
+	}
+	var (
+		dbUser                 = mustGetenv("BLOG_DB_USER")             // e.g. 'my-db-user'
+		dbPwd                  = mustGetenv("BLOG_DB_PASS")             // e.g. 'my-db-password'
+		dbName                 = mustGetenv("BLOG_DB_NAME")             // e.g. 'my-database'
+		instanceConnectionName = mustGetenv("INSTANCE_CONNECTION_NAME") // e.g. 'project:region:instance'
+		usePrivate             = os.Getenv("PRIVATE_IP")
+	)
+
+	d, err := cloudsqlconn.NewDialer(context.Background())
+	if err != nil {
+		return nil, nil, fmt.Errorf("cloudsqlconn.NewDialer: %v", err)
+	}
+	mysql.RegisterDialContext("cloudsqlconn",
+		func(ctx context.Context, addr string) (net.Conn, error) {
+			if usePrivate != "" {
+				return d.Dial(ctx, instanceConnectionName, cloudsqlconn.WithPrivateIP())
+			}
+			return d.Dial(ctx, instanceConnectionName)
+		})
+
+	dbURI := fmt.Sprintf("%s:%s@cloudsqlconn(localhost:3306)/%s?parseTime=true",
+		dbUser, dbPwd, dbName)
+
+	db, err := sql.Open("mysql", dbURI)
+	if err != nil {
+		return nil, func() { _ = db.Close() }, fmt.Errorf("sql.Open: %v", err)
 	}
 	xdb := sqlx.NewDb(db, "mysql")
 	return xdb, func() { _ = db.Close() }, nil

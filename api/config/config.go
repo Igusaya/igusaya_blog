@@ -3,7 +3,7 @@ package config
 import "github.com/caarlos0/env/v6"
 
 type Config struct {
-	Env        string `env:"BLOG_ENV" envDefault:"dev"`
+	Env        string `env:"BLOG_ENV" envDefault:"local"`
 	Port       int    `env:"PORT" envDefault:"80"`
 	DBHost     string `env:"BLOG_DB_HOST" envDefault:"127.0.0.1"`
 	DBPort     int    `env:"BLOG_DB_PORT" envDefault:"33306"`

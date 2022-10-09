@@ -19,6 +19,7 @@ func NewRouter(ctx context.Context, cfg *config.Config) (http.Handler, func(), e
 	clocker := clock.RealClocker{}
 	db, cleanup, err := mysql.New(ctx, cfg)
 	if err != nil {
+		fmt.Printf("err: %+v\n", err)
 		return nil, cleanup, err
 	}
 	// repository
