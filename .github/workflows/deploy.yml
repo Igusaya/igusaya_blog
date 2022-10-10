@@ -7,39 +7,88 @@ on:
       - "api/*"
       - ".github/workflows/deploy.yml"
 env:
+  # Croud Run
   SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GCP_REGION: ${{ secrets.GCP_REGION }}
   IMAGE: asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.SERVICE_NAME }}:${{ github.sha }}
+  # DB
+  PROXY_IMAGE: gcr.io/cloudsql-docker/gce-proxy
+  CLOUDSQL_INSTANCE_CONNECTION_NAME: ${{ secrets.DEV_CLOUDSQL_INSTANCE_CONNECTION_NAME }}
+  MYSQL_DSN: mysql://${{ secrets.MYSQL_USER }}:${{ secrets.DEV_MYSQL_PASSWORD }}@tcp(127.0.0.1:3306)/${{ secrets.MYSQL_DATABASE }}
+  MYSQL_PASSWORD: ${{ secrets.DEV_MYSQL_PASSWORD }}
+  MYSQL_USER: ${{ secrets.MYSQL_USER }}
+  MYSQL_DB_NAME : ${{ secrets.MYSQL_DATABASE }}
+
 jobs:
-  deploy-to-cloud-run:
-    runs-on: ubuntu-latest
+  migrate-db:
+    runs-on: ubuntu-18.04
+
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v1
 
-      - id: "auth"
-        uses: "google-github-actions/auth@v0"
-        with:
-          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+#      - id: auth
+#        name: Authenticate to Google Cloud
+#        uses: google-github-actions/auth@v0
+#        with:
+#          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+#          project_id: $GCP_PROJECT_ID
 
-      - name: Configure docker to use the gcloud cli
-        run: gcloud auth configure-docker --quiet
-
-      - name: Build a docker image
-        run: docker build -t ${{ env.IMAGE }} --target=deploy api/
-        # DockerFileを求められる
-
-      - name: Push the docker image
-        run: docker push ${{ env.IMAGE }}
-
-      - name: Deploy to Cloud Run
+      - name: Start Cloud SQL Proxy
         run: |
-            gcloud run deploy ${{ secrets.SERVICE_NAME }} \
-              --image $IMAGE \
-              --project $GCP_PROJECT_ID \
-              --region $GCP_REGION \
-              --platform=managed \
-              --allow-unauthenticated \
-              --quiet \
-              --set-env-vars=ENV=PRODUCTION
+          echo '${{ secrets.GCP_SA_KEY2 }}' > sa_key
+          docker pull $PROXY_IMAGE
+          docker run -d \
+            --name cloud-sql-proxy \
+            -p 127.0.0.1:5432:5432 \
+            gcr.io/cloudsql-docker/gce-proxy:1.32.0 /cloud_sql_proxy \
+            -instances=dev-igusaya-blog:asia-northeast1:igusaya-blog-db=tcp:0.0.0.0:5432 \
+            -credential_file=/config \
+
+      - name: Wait for starting
+        run: |
+          sleep 10s
+#          set -x
+#          until [ "$(docker inspect --format='{{.State.Health.Status}}' cloud-sql-proxy)" = 'healthy' ]; do
+#            sleep 1s
+#          done
+
+      - name: DB migration
+        run: |
+          go install github.com/k0kubun/sqldef/cmd/mysqldef@latest
+          export PATH="/home/runner/go/bin:$PATH"
+
+          mysqldef -u igusaya-github-account -p '$MYSQL_PASSWORD' -h 127.0.0.1 -P 5432 igusaya-blog-db --dry-run < ./api/_tools/mysql/schema.sql
+#          mysqldef -u igusaya-github-account -p '$MYSQL_PASSWORD' -S dev-igusaya-blog:asia-northeast1:igusaya-blog-db igusaya-blog-db --dry-run < ./api/_tools/mysql/schema.sql
+          
+
+#  deploy-to-cloud-run:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout the repository
+#        uses: actions/checkout@v2
+#
+#      - id: "auth"
+#        uses: "google-github-actions/auth@v0"
+#        with:
+#          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+#
+#      - name: Configure docker to use the gcloud cli
+#        run: gcloud auth configure-docker --quiet
+#
+#      - name: Build a docker image
+#        run: docker build -t ${{ env.IMAGE }} --target=deploy api/
+#        # DockerFileを求められる
+#
+#      - name: Push the docker image
+#        run: docker push ${{ env.IMAGE }}
+#
+#      - name: Deploy to Cloud Run
+#        run: |
+#            gcloud run deploy ${{ secrets.SERVICE_NAME }} \
+#              --image $IMAGE \
+#              --project $GCP_PROJECT_ID \
+#              --region $GCP_REGION \
+#              --platform=managed \
+#              --allow-unauthenticated \
+#              --quiet

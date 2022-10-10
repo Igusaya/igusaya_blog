@@ -1,3 +1,4 @@
 auth/
 api/tmp/*
 go.work
+go.work.*
