@@ -35,6 +35,15 @@ test.api: ## Execute api tests
 generate-mocks: ## generate mocks for api
 	go generate ./api/...
 
+server.front: ## Do npm run dev
+	npm --prefix ./front run dev
+
+lint.front: ## Do npm run lint
+	npm --prefix ./front run lint
+
+format: ## Do npm run format
+	npm --prefix ./front run format
+
 help: ## Show options
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
